@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Donate via UPI</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background: #f2f2f2;
+    display: flex;
+    height: 100vh;
+    justify-content: center;
+    align-items: center;
+    margin: 0;
+  }
+  .container {
+    background: white;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    width: 320px;
+    text-align: center;
+  }
+  h2 {
+    margin-bottom: 20px;
+    color: #333;
+  }
+  input[type="number"] {
+    width: 100%;
+    padding: 12px;
+    font-size: 16px;
+    margin-bottom: 20px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    box-sizing: border-box;
+  }
+  button {
+    width: 100%;
+    padding: 12px;
+    font-size: 18px;
+    background-color: #4caf50;
+    border: none;
+    color: white;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  button:hover {
+    background-color: #45a049;
+  }
+  .note {
+    margin-top: 15px;
+    font-size: 14px;
+    color: #555;
+  }
+  #qr-section {
+    margin-top: 25px;
+    display: none;
+  }
+  #qr-code {
+    width: 200px;
+    height: 200px;
+    margin: 0 auto;
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <h2>Donate via UPI</h2>
+  <input id="amount" type="number" placeholder="Enter amount (₹)" min="1" />
+  <button onclick="payOrShowQR()">Donate</button>
+  <p class="note">On mobile, you will be redirected to your UPI app.<br />On desktop, scan QR code with your UPI app to pay.</p>
+
+  <div id="qr-section">
+    <p><strong>Scan this QR code to pay ₹<span id="qr-amount"></span></strong></p>
+    <img id="qr-code" src="" alt="UPI QR Code" />
+    <p>Or pay using UPI ID: <strong>8891479505@fam</strong></p>
+  </div>
+</div>
+
+<script>
+  function isMobile() {
+    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+  }
+
+  function payOrShowQR() {
+    const amount = document.getElementById('amount').value;
+    if (!amount || amount < 1) {
+      alert('Please enter a valid donation amount (minimum ₹1)');
+      return;
+    }
+
+    const upiID = "8891479505@fam";
+    const payeeName = encodeURIComponent("Suhaim Soft");
+    const transactionNote = encodeURIComponent("Donation");
+
+    if (isMobile()) {
+      // Redirect to UPI app on mobile
+      const upiUrl = `upi://pay?pa=${upiID}&pn=${payeeName}&tn=${transactionNote}&am=${amount}&cu=INR`;
+      window.location.href = upiUrl;
+    } else {
+      // Show QR code on desktop
+      const qrSection = document.getElementById('qr-section');
+      const qrAmountSpan = document.getElementById('qr-amount');
+      const qrCodeImg = document.getElementById('qr-code');
+
+      qrAmountSpan.textContent = amount;
+
+      // UPI QR code format
+      const upiString = `upi://pay?pa=${upiID}&pn=${payeeName}&tn=${transactionNote}&am=${amount}&cu=INR`;
+
+      // Use qrserver.com API to generate QR code
+      const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(upiString)}`;
+
+      qrCodeImg.src = qrUrl;
+      qrSection.style.display = 'block';
+    }
+  }
+</script>
+
+</body>
+</html>
